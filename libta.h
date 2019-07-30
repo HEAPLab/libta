@@ -14,6 +14,7 @@
 
 namespace libta {
 
+
 //
 // ---------------------------------- ENUMERATIONS ---------------------------------- 
 //
@@ -25,9 +26,9 @@ namespace libta {
  * value represents with child-class actually is.
  */
 typedef enum class response_type_e {
-    PWCET_DISTRIBUTION,    /*!< The output is a statistical distribution */
-    WCET_VALUE,            /*!< The output is a single WCET value */
-    PWCET
+    PWCET,
+    INVALID_DATA,
+    INVALID_DISTRIBUTION
 } response_type_t;
 
 /**
@@ -36,9 +37,9 @@ typedef enum class response_type_e {
  * If the output is a distribution, this datatype is used to identify the distribution class.
  */
 typedef enum class distribution_type_e {
-    EVT_GEV,            /**< Generalized Extreme Value distribution */
-    EVT_GPD_2PARAM,        /**< Generalized Pareto distribution (2-parameters version) */
-    EVT_GPD_3PARAM        /**< Generalized Pareto distribution (3-parameters version) */
+    EVT_EXPONENTIAL,           
+    EVT_LIGHT_TAIL,      
+    EVT_HEAVY_TAIL 
 
 } distribution_type_t;
 
@@ -58,6 +59,45 @@ typedef enum  error_code {
  *
  * @note This class is not abstract but intended to be used with sub-classes only. 
  */
+template <class L, class R>
+class Either{
+
+private:
+    /**
+    * @brief Internal Enumeration to know if the state is Left or Right
+    */
+    enum lr_t { LEFT, RIGHT};
+    /**
+    * @brief Union that stores the data
+    */
+    union data_u {
+        L left; R right;
+    data_u(R r) {right=r;}
+    data_u(L l) {left=l;}
+
+    };
+
+    const lr_t type;
+    const data_u data;
+
+public:
+
+    Either() = delete;
+    Either(const Either<L,R> & src):data(src.data),type(src.type) {}
+    Either(R _right): data(_right), type(RIGHT) {}
+    Either(L _left): data(_left), type(RIGHT) {}
+
+    bool isLeft() {return type==LEFT; }
+    bool isRight() {return type==RIGHT; }
+
+    /** @brief If Either is Right return the stored value, otherwise return defaultVal */
+    R getRight( R defaultVal ) { return isRight() ? data.right : defaultVal;  }
+    /** @brief If Either is Left return the stored value, otherwise return defaultVal */
+    L getLeft( L defaultVal ) { return isLeft() ? data.left : defaultVal;  }
+
+};
+
+
 class Response {
 
 public:
@@ -81,131 +121,44 @@ public:
     }
     
 
+/**
+ * @brief An Invalid Response. It has a string message 
+ *
+ */
+
 private:
     const response_type_t resp_type;
 
 
 };
 
-/**
- * @brief The class returned by the timing analysis tool when the output is the EVT distribution
- *
- */
-class ResponseEVTDistribution : public Response {
+
+class ResponseInvalid : public Response {
 
 public:
+    const std::string message;
 
-    /**
-     * @brief The type for EVT distribution parameters
-     *
-     * GEV distribution has three parameters \mu, \sigma and \xi. The same for the 3-parameters
-     * version of GPD. In case of 2-parameters version GPD the first value (\mu) is not present and
-     * ignored. 
-     */
-    typedef std::tuple<float, float, float> parameters_t;
-
-    static constexpr int P_MU    = 0;    /**<  */
-    static constexpr int P_SIGMA = 1;    /**<  */
-    static constexpr int P_XI    = 2;    /**<  */
-
-    /**
-     * @brief The ResponseEVTDistribution class constructor
-     * @param dist_type  The subtype of EVT distribution (GEV/GPD)
-      */
-    ResponseEVTDistribution(distribution_type_t dist_type) 
-        : Response(response_type_t::PWCET_DISTRIBUTION),
-          dist_type(dist_type) {
-        
-    }
-    
-    /**
-     * @brief The ResponseEVTDistribution class default destructor
-      */
-    virtual ~ResponseEVTDistribution() = default;
-
-    /** @brief Setter for distribution parameters */
-    void set_parameters(float mu, float sigma, float xi) {
-        set_parameters(std::make_tuple(mu, sigma, xi));
-    }
-
-    /** @brief Setter for distribution parameters */
-    void set_parameters(parameters_t params) {
-        assert(std::get<P_MU>(params)   > 0);    // A negative mu has no sense for pWCET purposes
-        assert(std::get<P_SIGMA>(params) > 0);    // Cannot be negative
-
-        this->params = params;
-    }
-
-    /** @brief Getter for \mu parameter */
-    inline float get_mu()    const {
-        return std::get<P_MU>(params);
-    }
-
-    /** @brief Getter for \sg parameter */
-    inline float get_sigma() const {
-        return std::get<P_SIGMA>(params);
-    }
-
-    /** @brief Getter for \xi parameter */
-    inline float get_xi()    const {
-        return std::get<P_XI>(params);
-    }
-
-    /** @brief Getter for the paramters tuple */
-    inline parameters_t get_parameters() const {
-        return this->params;
-    }
-
-    /** @brief Getter for the distribution type */
-    inline distribution_type_t get_dist_type() const {
-        return this->dist_type;
-    }
-
-private:
-    const distribution_type_t dist_type;
-    parameters_t params;
-
+    ResponseInvalid(std::string msg, response_type_t invalidType ): 
+        Response(invalidType),
+        message(msg){ }
 };
 
-/**
- * @brief The class returned by the timing analysis tool when the output is a WCET value. The
- *        class is a template class because the WCET can be a float, an integer, etc. depending on
- *        the context.
- *
- */
-template <typename T>
-class ResponseWCET : public Response {
+class ResponseInvalidDistribution : public ResponseInvalid {
+    //TODO add meaningful message
+public:
+    ResponseInvalidDistribution():
+        ResponseInvalid("Cannot use this distribution", response_type_t::INVALID_DISTRIBUTION)          {}
+};
+
+
+class ResponseInvalidData : public ResponseInvalid {
 
 public:
-
-    /**
-     * @brief The ResponseWCET class constructor
-      */
-    ResponseWCET() : Response(response_type_t::WCET_VALUE)
-    {
-
-    }
-
-    /**
-     * @brief The ResponseWCET class default destructor
-      */
-    virtual ~ResponseWCET() = default;
-
-    /** @brief Getter for the WCET value */
-    inline T get_wcet_value() const {
-        return this-> wcet_value;
-    }
-
-    /** @brief Setter for the WCET value */
-    inline void set_wcet_value(T value) {
-        this->wcet_value = value;
-    }
-
-private:
-    T wcet_value;
-
-
+    //TODO add meaningful message
+    ResponseInvalidData():
+        ResponseInvalid("Not Enough points in given data", response_type_t::INVALID_DATA)          {}
 };
+
 
 template <typename T>
 class ResponsePWCET : public Response {
@@ -215,7 +168,8 @@ public:
     /**
      * @brief The ResponseWCET class constructor
       */
-    ResponsePWCET() : Response(response_type_t::PWCET)
+    ResponsePWCET(T _pWCET, T _pWCETlow, T _pWCEThigh) : Response(response_type_t::PWCET),
+        pWCET(_pWCET),pWCETlow(_pWCETlow), pWCEThigh(_pWCEThigh)
     {
 
     }
@@ -226,69 +180,52 @@ public:
     virtual ~ResponsePWCET() = default;
 
 
-    /** @brief Getter for the WCET value */
-    inline T get_wcet_value() const {
-        return this-> wcet_value;
-    }
-    /** @brief Setter for the WCET value */
-    inline void set_wcet_value(T value) {
-        this->wcet_value = value;
-    }
-
-
     inline T get_pwcet_value() const {
-        return this-> pwcet_value;
+        return this->pWCET;
     }
-    /** @brief Setter for the WCET value */
-    inline void set_pwcet_value(T value) {
-        this->pwcet_value = value;
-    }
-
-
-
-    inline void add_value_rank(const T& value) {
-        this->rank.push_back(value);
-    }
-    inline void add_value_probCCDF(const T& value) {
-        this->probCCDF.push_back(value);
-    }
-    inline void add_value_probCCDFhigh(const T& value) {
-        this->probCCDFhigh.push_back(value);
-    }
-    inline void add_value_probCCDFlow(const T& value) {
-        this->probCCDFlow.push_back(value);
-    }
-
-
-
-    inline void set_mincv_used(const int value){
-        this->mincv_used = value;
-    }
-    inline int get_mincv_used(){
-      return this->mincv_used;
-    }
-
-    inline void set_error(const  error_code_pa value){
-        this->error = value;
-    }
-    inline error_code_pa get_error(){
-        return this->error;
-    }
-
+    
 private:
-
-
-    T wcet_value;
-    T pwcet_value;
-    std::vector<T> rank;
-    std::vector<T> probCCDF;
-    std::vector<T> probCCDFhigh;
-    std::vector<T> probCCDFlow;
-
-    int mincv_used;
-    error_code_pa error;
+    const T pWCET, pWCETlow, pWCEThigh;
 
 };
+
+
+/**
+ * @brief The class returned by the timing analysis tool when the output is the EVT distribution
+ *
+ */
+template <typename T>
+class EVTDistribution {
+
+public:
+
+    /**
+     * @brief The ResponseEVTDistribution class constructor
+     * @param dist_type  The subtype of EVT distribution (GEV/GPD)
+      */
+    EVTDistribution(distribution_type_t dist_type, 
+            std::vector<T> rank, std::vector<T> pWCETlow, std::vector<T> pWCEThigh ) 
+        : dist_type(dist_type) {
+        
+    }
+    
+    virtual ~EVTDistribution() = default;
+    
+    /**
+     * @brief  getTheExecutionTime that exceeds with the given probability
+     */
+    Either<ResponseInvalidDistribution,ResponsePWCET<T> > getWCET(T probability){
+        //TODO implement
+        ResponsePWCET<T> resp(0,0,0);
+        return Either<ResponseInvalidDistribution,ResponsePWCET<T> > (resp); 
+    }
+
+
+private:
+    const distribution_type_t dist_type;
+    const std::vector<T> rank, pWCET, pWCETlow, pWCEThigh;
+};
+
 
 
 /**
@@ -341,7 +278,6 @@ public:
 private:
 
     std::vector<T> execution_times;
-
 };
 
 /**
@@ -350,13 +286,17 @@ private:
  * @note This class is abstract and must be inherited to be instanced.
  */
 template <typename T>
-class TimingAnalyzer {
+class DistributionAnalyzer {
 
 public:
     /**
      * @brief The main method to be implemented that will perform the analysis.
      */
-    virtual std::shared_ptr<Response> perform_analysis(std::shared_ptr<Request<T>> req) = 0 ;
+    virtual std::shared_ptr< Either<ResponseInvalidData,EVTDistribution<T> > > perform_analysis(std::shared_ptr<Request<T>> req) {
+
+        //TODO implement
+        return std::make_shared< Either<ResponseInvalidData,EVTDistribution<T> > >();
+       }
 
 };
 
