@@ -26,7 +26,8 @@ namespace libta {
  */
 typedef enum class response_type_e {
     PWCET_DISTRIBUTION,    /*!< The output is a statistical distribution */
-    WCET_VALUE            /*!< The output is a single WCET value */
+    WCET_VALUE,            /*!< The output is a single WCET value */
+    PWCET
 } response_type_t;
 
 /**
@@ -40,6 +41,13 @@ typedef enum class distribution_type_e {
     EVT_GPD_3PARAM        /**< Generalized Pareto distribution (3-parameters version) */
 
 } distribution_type_t;
+
+typedef enum  error_code {
+    no_error ,
+    no_nelems_enoght
+
+} error_code_pa;
+
 
 //
 // ------------------------------------ CLASSES ------------------------------------ 
@@ -199,6 +207,90 @@ private:
 
 };
 
+template <typename T>
+class ResponsePWCET : public Response {
+
+public:
+
+    /**
+     * @brief The ResponseWCET class constructor
+      */
+    ResponsePWCET() : Response(response_type_t::PWCET)
+    {
+
+    }
+
+    /**
+     * @brief The ResponseWCET class default destructor
+      */
+    virtual ~ResponsePWCET() = default;
+
+
+    /** @brief Getter for the WCET value */
+    inline T get_wcet_value() const {
+        return this-> wcet_value;
+    }
+    /** @brief Setter for the WCET value */
+    inline void set_wcet_value(T value) {
+        this->wcet_value = value;
+    }
+
+
+    inline T get_pwcet_value() const {
+        return this-> pwcet_value;
+    }
+    /** @brief Setter for the WCET value */
+    inline void set_pwcet_value(T value) {
+        this->pwcet_value = value;
+    }
+
+
+
+    inline void add_value_rank(const T& value) {
+        this->rank.push_back(value);
+    }
+    inline void add_value_probCCDF(const T& value) {
+        this->probCCDF.push_back(value);
+    }
+    inline void add_value_probCCDFhigh(const T& value) {
+        this->probCCDFhigh.push_back(value);
+    }
+    inline void add_value_probCCDFlow(const T& value) {
+        this->probCCDFlow.push_back(value);
+    }
+
+
+
+    inline void set_mincv_used(const int value){
+        this->mincv_used = value;
+    }
+    inline int get_mincv_used(){
+      return this->mincv_used;
+    }
+
+    inline void set_error(const  error_code_pa value){
+        this->error = value;
+    }
+    inline error_code_pa get_error(){
+        return this->error;
+    }
+
+private:
+
+
+    T wcet_value;
+    T pwcet_value;
+    std::vector<T> rank;
+    std::vector<T> probCCDF;
+    std::vector<T> probCCDFhigh;
+    std::vector<T> probCCDFlow;
+
+    int mincv_used;
+    error_code_pa error;
+
+};
+
+
 /**
  * @brief The class representing the objects sent to the timing analysis tool 
  *
@@ -242,6 +334,9 @@ public:
     inline void add_value(const T& time) {
         this->execution_times.push_back(time);
     }
+    inline int get_size(){
+        return this->execution_times.size();
+    }
 
 private:
 
@@ -261,7 +356,7 @@ public:
     /**
      * @brief The main method to be implemented that will perform the analysis.
      */
-    virtual std::shared_ptr<Response> perform_analysis(std::shared_ptr<Request<T>> req) = 0;
+    virtual std::shared_ptr<Response> perform_analysis(std::shared_ptr<Request<T>> req) = 0 ;
 
 };
 
