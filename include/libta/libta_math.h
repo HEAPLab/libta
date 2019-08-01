@@ -68,7 +68,11 @@ namespace libta {
     }
 
 
-    //Returns the sum of the generated values
+     /**
+     * @brief The method transform the vector src values to Exponential Probability Density Function and
+     *        it saves to 'dest vector'. For the calculation it uses 'rate' value.
+     *        The function return sum value, which is equal to the sum of all values of dest vector.
+     */
     template <typename T>
     T setExponProbabilyDensityFunction(std::vector<T> & dest, const std::vector<T> & src,T rate) {
         T sum=0;
@@ -79,6 +83,11 @@ namespace libta {
         return sum;
     }
 
+     /**
+     * @brief The method transform the vector src values to Exponential Survival Function and it
+     *        saves to 'dest vector'. For the calculation it uses 'rate' value.      
+     *        
+     */
     template <typename T>
     void setExponSurvivalFunction(std::vector<T> & dest, const std::vector<T> & src, T rate) {
         const T sum= setExponProbabilyDensityFunction(dest, src,  rate);
