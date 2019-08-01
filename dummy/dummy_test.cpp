@@ -1,4 +1,4 @@
-#include "libta.h"
+#include "libta/libta.h"
 
 #include <iostream>
 #include <memory>
@@ -8,16 +8,59 @@
 #include <math.h>
 
 
-#define type long double
+/**
+ * Double is a good balance between accuracy and performance.
+ * the smallest double denormal value is around  4.94e-324 .
+ * In single float the smaller value (denormal) is 2−149 ≈ 1.4e−45
+ * Performance between double and float are comparable also in this case
+**/
+#define type double
+
+using namespace libta;
+using namespace std;
+using namespace neither;
+
+
+void getDistributionInformation(std::shared_ptr<EVTDistribution<type> > distribution){
+
+    std::cout<<"Tail values used: "<<distribution->getTailValues().size()<<std::endl;
+    std::cout<<"MET: "<<distribution->getMaxExecutionTime()<<std::endl;
+
+    const std::vector<type> probs ={1e-3,1e-6,1e-9,1e-12,1e-15};
+
+    for (auto prob : probs) {
+        distribution->getPWCET(prob).join(
+        [](auto errorResponse) {
+            cout<<"Can't get pWCET value. Reason: "<<errorResponse.get_message()<<endl;
+        }, // error-case
+        [prob](auto result) {
+            cout<<prob<<": "<<result.pWCET<<endl;    // success-case
+        }
+                                          );   
+    }
+    cout<<"Confidence intervals (95%)"<<endl;
+     for (auto prob : probs) {
+        string p_low=distribution->getPWCETLow(prob).join(
+        [](auto errorResponse) {
+            return "Can't get pWCETlow value. Reason: "+errorResponse.get_message();
+        }, // error-case
+        [](auto result) {return std::to_string(result.pWCET);}    // success-case
+        );   
+        string p_high=distribution->getPWCETHigh(prob).join(
+        [](auto errorResponse) {
+            return "Can't get pWCEThigh value. Reason: "+errorResponse.get_message();
+        }, // error-case
+        [](auto result) {return std::to_string(result.pWCET);}    // success-case
+        );
+        cout<<prob<<": "<<p_low<<" "<<p_high<<endl;   
+    }
+
+}
+
 int main(int argc, char * argv[]) {
 
-    using namespace libta;
-    using namespace std;
-    using namespace neither;
-
+    //Fill the request with the values from a file
     auto req = std::make_shared<Request<type>>();
-
-    //FILL REQUEST VALUE
     char * end;
     std::string line;
     std::ifstream myfile (argv[1]);
@@ -33,31 +76,17 @@ int main(int argc, char * argv[]) {
     }
 
     DistributionAnalyzer<type> analyzer;
-    auto distEither = analyzer.perform_analysis( req );
-    
-    std::shared_ptr< EVTDistribution<type> > distribution = distEither.join(
-    [](auto errorDistribution) { return std::shared_ptr<EVTDistribution<type> > (
-        new EVTDistribution<type>(distribution_type_e::EVT_EMPTY,
-        {},{},{},{},{})) ; }, // error-case
-    [](auto x) { return x; } // success-case
-   );
+    auto distEither = analyzer.estimate_distribution( req );
 
-    std::cout<<"Tail values used: "<<distribution->getTailValues().size()<<std::endl;
-    std::cout<<"MET: "<<distribution->getMaxExecutionTime()<<std::endl;
 
-    for (auto prob : {1e-3,1e-6,1e-9,1e-12,1e-15}){
-           ResponsePWCET<type> resultWCET =  distribution->getWCET(prob).join(
-              [](auto errorPWCET) { return ResponsePWCET<type>(0); }, // error-case
-                 [](auto x) { return x; } // success-case
+    distEither.join(
+    [](auto errorDistribution) {
+        cout<<"Cant't estimate distribution. Reason: "<<errorDistribution.get_message()<<endl;
+    }, // error-case
+    [](auto x){
+        getDistributionInformation(x); }   // success-case
             );
-        cout<<prob<<": "<<resultWCET.pWCET<<endl;
-    }
-    /*
-      std::cout << "WCET Value: " << rwcet->get_wcet_value() << std::endl;
-      std::cout << "PWCET Value: " << rwcet->get_pwcet_value() << std::endl;
-      std::cout << "Micv used: " << rwcet->get_mincv_used() << std::endl;
-      std::cout << "Error code : " << rwcet->get_error()  <<std::endl;
-    */
+    
 
-}
+} //end main
 
