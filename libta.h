@@ -312,14 +312,26 @@ private:
 template <typename T>
 class DistributionAnalyzer {
 
+
+     /**
+     * @brief The method calculates Pow operation, it uses 'powl' if T is long double, otherwise 'pow'.
+     */
       inline T internalPow(T base, T exp){
         return std::is_same<T, long double>::value ? powl(base,exp) : pow(base, exp);
       }
 
+
+     /**
+     * @brief The method calculates Sqrt operation, it uses 'sqrtl' if T is long double, otherwise 'sqrt'.
+     */
       inline T internalSqrt(T v){
         return std::is_same<T, long double>::value ? sqrtl(v) : sqrt(v);
       }
 
+     /**
+     * @brief The method calculates the mean of the vector's values. The used values of the vector are bounded
+     *        by start variable and size variable.
+     */
       T getUnbiasedMean(std::vector<T> v, size_t start, size_t size){
           assert(start+size <= v.size());
           assert(start+size-1 >= 0);
@@ -330,6 +342,10 @@ class DistributionAnalyzer {
           return result/size;
       }
 
+     /**
+     * @brief The method calculates the Std (Standard deviation) of the vector's values. 
+     *        The used values of the vector are bounded by start variable and size.
+     */
       T getUnbiasedStdDeviation(std::vector<T> v, size_t start, size_t size){
           assert(start+size <= v.size());
           assert(start+size-1 >= 0);
@@ -343,6 +359,11 @@ class DistributionAnalyzer {
           return internalSqrt( sumOfSquares/(size-1)-internalPow(sumOfValues,2)/((size-1)*size) );
       }
 
+     /**
+     * @brief The method fill the vec vector in this way. The first position will be equal to start value, 
+     *        the last position will be equal to end. One of the middle values will be equal the previous
+     *        value plus step variable.
+     */
       void arange( std::vector<T> & vec , const T start ,  const T end ,  const T step ){
             vec[0]=start;
             for(size_t i = 1; i<vec.size() ; i++){
@@ -350,7 +371,12 @@ class DistributionAnalyzer {
             }
       }
 
-      //Returns the sum of the generated values
+
+     /**
+     * @brief The method transform the vector src values to Exponential Probability Density Function and
+     *        it saves to 'dest vector'. For the calculation it uses 'rate' value.
+     *        The function return sum value, which is equal to the sum of all values of dest vector.
+     */
       T setExponProbabilyDensityFunction(std::vector<T> & dest , const std::vector<T> & src ,T rate){
         T sum=0;
         for(size_t i=0;i<dest.size();i++){
@@ -360,7 +386,11 @@ class DistributionAnalyzer {
         return sum;
       }
 
-
+     /**
+     * @brief The method transform the vector src values to Exponential Survival Function and it
+     *        saves to 'dest vector'. For the calculation it uses 'rate' value.      
+     *        
+     */
       void setExponSurvivalFunction(std::vector<T> & dest , const std::vector<T> & src , T rate){
         const T sum= setExponProbabilyDensityFunction(dest , src ,  rate);
         const int size = dest.size();
