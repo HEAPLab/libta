@@ -93,26 +93,20 @@ namespace libta {
         const T sum= setExponProbabilyDensityFunction(dest, src,  rate);
         const int size = dest.size();
         {   //Scope to limit tmp
-            std::vector<T> tmp = dest;
-            dest[0]=0;
-            for(int i=1; i<size; i++) {
-                dest[i] =  dest[i-1] + tmp[i-1]/sum;
-                //We don't need dest[i-1] anymore. If dest[i-1] is less than 0, then set to zero
-                dest[i-1] = 1.0 - dest[i-1];
-                if(dest[i-1]< 0) {
-                    dest[i-1]=0;
-                }
+            std::vector<T> tmp = dest ; 
+            dest[0] = 0;
+            for(int i=1;i<size;i++){
+                 dest[i] = dest[i-1] + tmp[i-1]/sum;
             }
-        }
+    
+            for(int i=0; i<size;i++){
+                T tmpvalue = 1 - dest[i];
+                if(tmpvalue <= 0 ) dest[i] = 0;
+                else dest[i] = tmpvalue; 
+            }
+      }
 
-        //Correct the value for the last element
-        dest[size-1] = 1.0 - dest[size-1];
-        if(dest[size-1]< 0) {
-            dest[size-1]=0;
-        }
     }
-
-
 };
 
 #endif

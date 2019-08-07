@@ -366,7 +366,6 @@ public:
             T std_deviation = getUnbiasedStdDeviation(trace_sorted,0,usedSamples);
             cv[rejectedSamples-2]= std_deviation/mean;
         }
-
         //Compute the region of acceptance for the exponential tail.
         //This is the red cone in a CV-plot
         //Impose the template enforce the type casting of the input
@@ -402,7 +401,9 @@ public:
         const T ratehigh = rate *(1 - (1.96/internalSqrt<T>(nelems)));
 
         //Biggest value in nelems is the MET
-        const T rank_end =20 * trace_sorted[0] ;
+       // const T rank_end =20 * trace_sorted[0] ;
+
+        const T rank_end = 20 * (trace_sorted[0] - trace_sorted[nelems-1]);
         const T rank_start = 0 ;
         const T rank_step = (rank_end - rank_start)/ (rank_length-1);
         //Generate values for rank
@@ -411,11 +412,11 @@ public:
         std::vector<T> probCCDFlow(rank_length,0);
         std::vector<T> probCCDFhigh(rank_length,0);
         arange(rank,rank_start,rank_step);
+
         //The most expensive step is this one. Especially if you use long double
         setExponSurvivalFunction(probCCDF,rank, rate);
         setExponSurvivalFunction(probCCDFlow,rank, ratelow);
         setExponSurvivalFunction(probCCDFhigh,rank, ratehigh);
-
         //Add mean to all the rank values.
         //TODO!!! already create rank starting from the mean and keep it into
         // account while generating the survival function.

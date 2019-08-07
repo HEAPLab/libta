@@ -14,7 +14,7 @@
  * In single float the smaller value (denormal) is 2−149 ≈ 1.4e−45
  * Performance between double and float are comparable also in this case
 **/
-#define type double
+#define type  double 
 
 using namespace libta;
 using namespace std;
