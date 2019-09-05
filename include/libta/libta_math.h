@@ -61,6 +61,9 @@ namespace libta {
     */
     template <typename T>
     void arange( std::vector<T> & vec, const T start, const T step ) {
+        assert(vec.size() !=0);
+        assert(vec.size() > 2);
+
         vec[0]=start;
         for(size_t i = 1; i<vec.size() ; i++) {
             vec[i] = vec[i-1]+step ;
@@ -75,6 +78,9 @@ namespace libta {
      */
     template <typename T>
     T setExponProbabilyDensityFunction(std::vector<T> & dest, const std::vector<T> & src,T rate) {
+        assert(src.size() != 0);
+        assert(dest.size() != 0);
+
         T sum=0;
         for(size_t i=0; i<dest.size(); i++) {
             dest[i] = rate * internalPow<T>(M_E,-rate * src[i]) ;
@@ -90,6 +96,9 @@ namespace libta {
      */
     template <typename T>
     void setExponSurvivalFunction(std::vector<T> & dest, const std::vector<T> & src, T rate) {
+        assert(src.size() != 0);
+        assert(dest.size() != 0);
+
         const T sum= setExponProbabilyDensityFunction(dest, src,  rate);
         const int size = dest.size();
         {   //Scope to limit tmp

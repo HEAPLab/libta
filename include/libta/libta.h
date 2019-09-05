@@ -134,8 +134,9 @@ public:
 class ResponseInvalidData : public ResponseInvalid {
 public:
     //TODO add meaningful message
-    ResponseInvalidData():
-        ResponseInvalid("Not Enough points in given data", response_type_t::INVALID_DATA) {}
+    ResponseInvalidData(std::string message):
+        //ResponseInvalid("Not Enough points in given data", response_type_t::INVALID_DATA) {}
+          ResponseInvalid(message, response_type_t::INVALID_DATA) {}
 };
 
 
@@ -347,6 +348,7 @@ public:
         //Copy in vector and sort it
         //std::vector<T> trace_sorted(req->cbegin(),req->cend());
         auto trace_sorted = req->get_all();
+        if(trace_sorted.size() <= 10 ) neither::left( ResponseInvalidData("The number of samples is '10' or less in the Request.\nPlease get more samples.\n") ); ;
         std::sort(trace_sorted.begin(),trace_sorted.end(), std::greater<T>() );
 
         //Init Required stuff
@@ -391,7 +393,7 @@ public:
         //We need at least minvalues samples to estimate the tail.
         //If this property is not satisfied, we're force to fail.
         if(nelems < minvalues)
-            return neither::left( ResponseInvalidData() );
+            return neither::left( ResponseInvalidData("Minvalues samples are not satisfied.\nYou need to get more samples.\n") );
 
         T excessesMean = getUnbiasedMean(trace_sorted,0,nelems);
         std::vector<T> tailValues(trace_sorted.begin(), trace_sorted.begin()+nelems);
