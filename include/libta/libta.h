@@ -422,8 +422,7 @@ public:
         //Add mean to all the rank values.
         //TODO!!! already create rank starting from the mean and keep it into
         // account while generating the survival function.
-        const T mean = std::accumulate(trace_sorted.begin(), trace_sorted.end(), 0.0)/ trace_sorted.size();
-        for( auto &v : rank )  v += mean;
+        for( auto &v : rank )  v += trace_sorted[nelems-1];
 
         //TODO estimate the real type of tail
         return neither::right(std::make_shared <EVTDistribution<T> > (distribution_type_e::EVT_EXPONENTIAL,
