@@ -1,4 +1,4 @@
-/** @file libhwrel.h
+/** @file libta.h
  * The main header file for libta.
  *
  * This header contains the main classes to be used for interfacing the resource manager with the
@@ -27,7 +27,7 @@ namespace libta {
  */
 typedef enum class response_type_e {
     PWCET_DISTRIBUTION,    /*!< The output is a statistical distribution */
-    WCET_VALUE            /*!< The output is a single WCET value */
+    WCET_VALUE             /*!< The output is a single WCET value */
 } response_type_t;
 
 /**
@@ -36,9 +36,9 @@ typedef enum class response_type_e {
  * If the output is a distribution, this datatype is used to identify the distribution class.
  */
 typedef enum class distribution_type_e {
-    EVT_GEV,            /**< Generalized Extreme Value distribution */
+    EVT_GEV,               /**< Generalized Extreme Value distribution */
     EVT_GPD_2PARAM,        /**< Generalized Pareto distribution (2-parameters version) */
-    EVT_GPD_3PARAM        /**< Generalized Pareto distribution (3-parameters version) */
+    EVT_GPD_3PARAM         /**< Generalized Pareto distribution (3-parameters version) */
 
 } distribution_type_t;
 
@@ -68,7 +68,7 @@ public:
      * @brief The Response class constructor
      * @param res_type  The type of response
       */
-    Response(response_type_t resp_type) : resp_type(resp_type) {
+    Response(response_type_t resp_type) noexcept : resp_type(resp_type) {
 
     }
 
@@ -78,7 +78,7 @@ public:
     virtual ~Response() = default;
 
     /** @brief Getter for reponse type */
-    inline response_type_t get_response_type() const {
+    inline response_type_t get_response_type() const noexcept {
         return this->resp_type;
     }
     
@@ -114,7 +114,7 @@ public:
      * @brief The ResponseEVTDistribution class constructor
      * @param dist_type  The subtype of EVT distribution (GEV/GPD)
       */
-    ResponseEVTDistribution(distribution_type_t dist_type) 
+    ResponseEVTDistribution(distribution_type_t dist_type) noexcept
         : Response(response_type_t::PWCET_DISTRIBUTION),
           dist_type(dist_type) {
         
@@ -126,12 +126,12 @@ public:
     virtual ~ResponseEVTDistribution() = default;
 
     /** @brief Setter for distribution parameters */
-    void set_parameters(float mu, float sigma, float xi) {
+    void set_parameters(float mu, float sigma, float xi) noexcept {
         set_parameters(std::make_tuple(mu, sigma, xi));
     }
 
     /** @brief Setter for distribution parameters */
-    void set_parameters(parameters_t params) {
+    void set_parameters(parameters_t params) noexcept {
         assert(std::get<P_MU>(params)   > 0);    // A negative mu has no sense for pWCET purposes
         assert(std::get<P_SIGMA>(params) > 0);    // Cannot be negative
 
@@ -139,27 +139,27 @@ public:
     }
 
     /** @brief Getter for \mu parameter */
-    inline float get_mu()    const {
+    inline float get_mu()    const noexcept {
         return std::get<P_MU>(params);
     }
 
     /** @brief Getter for \sg parameter */
-    inline float get_sigma() const {
+    inline float get_sigma() const noexcept {
         return std::get<P_SIGMA>(params);
     }
 
     /** @brief Getter for \xi parameter */
-    inline float get_xi()    const {
+    inline float get_xi()    const noexcept {
         return std::get<P_XI>(params);
     }
 
     /** @brief Getter for the paramters tuple */
-    inline parameters_t get_parameters() const {
+    inline parameters_t get_parameters() const noexcept {
         return this->params;
     }
 
     /** @brief Getter for the distribution type */
-    inline distribution_type_t get_dist_type() const {
+    inline distribution_type_t get_dist_type() const noexcept {
         return this->dist_type;
     }
 
@@ -183,7 +183,7 @@ public:
     /**
      * @brief The ResponseWCET class constructor
       */
-    ResponseWCET() : Response(response_type_t::WCET_VALUE)
+    ResponseWCET() noexcept : Response(response_type_t::WCET_VALUE)
     {
 
     }
@@ -195,7 +195,7 @@ public:
 
     /** @brief Getter for the WCET value */
     inline T get_wcet_value() const {
-        return this-> wcet_value;
+        return this->wcet_value;
     }
 
     /** @brief Setter for the WCET value */
@@ -221,30 +221,30 @@ public:
     /**
      * @brief The ResponseWCET class constructor
       */
-    Request() {}
+    Request() noexcept {}
 
     /** @brief Begin iterator for for-range-loops */
-    inline typename std::vector<T>::iterator begin() {
+    inline typename std::vector<T>::iterator begin() noexcept {
         return this->execution_times.begin();
     }
 
     /** @brief Const begin iterator for for-range-loops */
-    inline typename std::vector<T>::const_iterator cbegin() const {
+    inline typename std::vector<T>::const_iterator cbegin() const noexcept {
         return this->execution_times.cbegin();
     }
 
     /** @brief End iterator for for-range-loops */
-    inline typename std::vector<T>::iterator end() {
+    inline typename std::vector<T>::iterator end() noexcept {
         return this->execution_times.end();
     }
 
     /** @brief Const end iterator for for-range-loops */
-    inline typename std::vector<T>::const_iterator cend() const {
+    inline typename std::vector<T>::const_iterator cend() const noexcept {
         return this->execution_times.cend();
     }
 
     /** @brief Getter for the whole timing array. Do not try to edit the returned value. */
-    inline const std::vector<T> &get_all() const {
+    inline const std::vector<T> &get_all() const noexcept {
         return this->execution_times;
     }
 
