@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include <exception>
 
 namespace libta {
 
@@ -40,6 +41,15 @@ typedef enum class distribution_type_e {
     EVT_GPD_3PARAM        /**< Generalized Pareto distribution (3-parameters version) */
 
 } distribution_type_t;
+
+/**
+ * @brief The enumeration for the error returned by the analyzer
+ *
+ */
+typedef enum class error_e {
+    INVALID_DATA,
+    INVALID_DISTRIBUTION
+} error_t;
 
 //
 // ------------------------------------ CLASSES ------------------------------------ 
@@ -247,6 +257,22 @@ private:
 
     std::vector<T> execution_times;
 
+};
+
+class TimingAnalyzerError : public std::runtime_error {
+
+public:
+	TimingAnalyzerError(const std::string& what_arg, error_t err_type) noexcept
+											: std::runtime_error(what_arg), err(err_type) {}
+
+	virtual ~TimingAnalyzerError() = default;
+
+	inline error_t get_type() const noexcept {
+		return this->err;
+	}
+
+private:
+	error_t err;
 };
 
 /**
