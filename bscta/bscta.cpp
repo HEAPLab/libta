@@ -104,7 +104,7 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 	this->high_gpd = std::make_shared <ResponseEVTDistribution> (distribution_type_e::EVT_GPD_2PARAM);
 	this->high_gpd->set_parameters(0, ratehigh, 0);
 
-	auto gpd = std::make_shared <ResponseEVTDistribution > (distribution_type_e::EVT_GPD_2PARAM);
+	auto gpd = std::make_shared <ResponseEVTDistribution> (distribution_type_e::EVT_GPD_2PARAM);
 	gpd->set_parameters(0, rate, 0);
     return gpd;
 

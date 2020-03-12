@@ -132,8 +132,8 @@ public:
 
     /** @brief Setter for distribution parameters */
     void set_parameters(parameters_t params) noexcept {
-        assert(std::get<P_MU>(params)   > 0);    // A negative mu has no sense for pWCET purposes
-        assert(std::get<P_SIGMA>(params) > 0);    // Cannot be negative
+        assert(std::get<P_MU>(params)   >= 0);    // A negative mu has no sense for pWCET purposes
+        assert(std::get<P_SIGMA>(params) > 0);    // Must be positive
 
         this->params = params;
     }
@@ -223,6 +223,8 @@ public:
       */
     Request() noexcept {}
 
+    virtual ~Request() = default;
+
     /** @brief Begin iterator for for-range-loops */
     inline typename std::vector<T>::iterator begin() noexcept {
         return this->execution_times.begin();
@@ -285,7 +287,7 @@ class TimingAnalyzer {
 
 public:
 
-	virtual ~TimingAnalyzer();
+	virtual ~TimingAnalyzer() = default;
 
     /**
      * @brief The main method to be implemented that will perform the analysis.
