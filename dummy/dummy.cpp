@@ -26,7 +26,7 @@ namespace libta {
 
 };    // libta,
 
-
+/*
 int main() {
 
     using namespace libta;
@@ -43,3 +43,4 @@ int main() {
 
 }
 
+*/
