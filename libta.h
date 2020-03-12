@@ -104,7 +104,7 @@ public:
      * version of GPD. In case of 2-parameters version GPD the first value (\mu) is not present and
      * ignored. 
      */
-    typedef std::tuple<float, float, float> parameters_t;
+    typedef std::tuple<double, double, double> parameters_t;
 
     static constexpr int P_MU    = 0;    /**<  */
     static constexpr int P_SIGMA = 1;    /**<  */
@@ -126,7 +126,7 @@ public:
     virtual ~ResponseEVTDistribution() = default;
 
     /** @brief Setter for distribution parameters */
-    void set_parameters(float mu, float sigma, float xi) noexcept {
+    void set_parameters(double mu, double sigma, double xi) noexcept {
         set_parameters(std::make_tuple(mu, sigma, xi));
     }
 
@@ -139,17 +139,17 @@ public:
     }
 
     /** @brief Getter for \mu parameter */
-    inline float get_mu()    const noexcept {
+    inline double get_mu()    const noexcept {
         return std::get<P_MU>(params);
     }
 
     /** @brief Getter for \sg parameter */
-    inline float get_sigma() const noexcept {
+    inline double get_sigma() const noexcept {
         return std::get<P_SIGMA>(params);
     }
 
     /** @brief Getter for \xi parameter */
-    inline float get_xi()    const noexcept {
+    inline double get_xi()    const noexcept {
         return std::get<P_XI>(params);
     }
 
@@ -284,6 +284,9 @@ template <typename T>
 class TimingAnalyzer {
 
 public:
+
+	virtual ~TimingAnalyzer();
+
     /**
      * @brief The main method to be implemented that will perform the analysis.
      */
