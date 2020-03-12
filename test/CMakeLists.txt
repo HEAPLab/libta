@@ -7,9 +7,11 @@ if((DEFINED GTEST_LIBRARY) OR (DEFINED GTEST_MAIN_LIBRARY))
 	message(STATUS "Google Test framework found.")
 	include_directories(${GTEST_INCLUDE_DIR} "../")
 
+	set(TEST_SOURCES test-suite.cpp)
+	set(TEST_SOURCES ${TEST_SOURCES} test-dist-${IMP_L}.cpp)
+
 	add_executable(libta-testing
-	    test-suite.cpp
-		test-distributions.cpp
+		${TEST_SOURCES}
 	)
 
 	target_link_libraries(libta-testing ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
