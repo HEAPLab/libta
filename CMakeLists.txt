@@ -20,3 +20,4 @@ endif()
 
 # Include that for the building
 add_subdirectory(${IMP_L})
+add_subdirectory(test)
