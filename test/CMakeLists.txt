@@ -9,6 +9,7 @@ if((DEFINED GTEST_LIBRARY) OR (DEFINED GTEST_MAIN_LIBRARY))
 
 	set(TEST_SOURCES test-suite.cpp)
 	set(TEST_SOURCES ${TEST_SOURCES} test-dist-${IMP_L}.cpp)
+	set(TEST_SOURCES ${TEST_SOURCES} test-internals-${IMP_L}.cpp)
 
 	add_executable(libta-testing
 		${TEST_SOURCES}
