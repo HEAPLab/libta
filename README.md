@@ -3,6 +3,10 @@
 libta is a library for timing analysis. It applies Extreme Value Theory to a set of time
 measurements in order to estimate the WCET (Worst-Case Execution Time) with a given probability.
 
+## LICENSE
+Check the LICENSE file in the root directory for the license of the overall library API. For
+implementation-specific libraries please check the LICENSE file in the related subdirectories
+
 ## Requirements
 - CMake (>=3.8)
 - G++ or CLang (any version with C++14 support)
@@ -29,7 +33,7 @@ The library leverages templates, so you can pick the datatype you want to perfor
 Depending on the implementation, the library uses different data type for the input time series.
 
 ### bscta
-We suggest to use double it may be required to perform computiation with values below *10^-10* and
+We suggest to use double it may be required to perform computation with values below *10^-10* and
 with single-precision float it may lead to inaccuracies. On the other side, using long double may
 allow to get results more precise, but the computation is way slower.
 
