@@ -1,4 +1,3 @@
-#include "sec.hpp"
 #include "SimpleChronovise.hpp"
 
 #include "libta.h"
@@ -13,12 +12,16 @@
 #include "statistical/test_ljung_box.hpp"
 #include "input/generator_null.hpp"
 
+#include "utility/oop.hpp"
+#include "evt/gpd_distribution.hpp"
 
 namespace libta {
 
     class ChronoviseTimingAnalyzer : public TimingAnalyzer<unsigned long> {
 
     public:
+
+        std::shared_ptr<ResponseEVTDistribution> rdist;
 
         virtual std::shared_ptr<Response> perform_analysis(std::shared_ptr<Request<unsigned long>> req) {
 
@@ -30,10 +33,18 @@ namespace libta {
 
             (void)exec_times;
             std::shared_ptr<ResponseWCET<unsigned long>> rwcet = std::make_shared<ResponseWCET<unsigned long>>();
-            rwcet->set_wcet_value(solver.get_pwcet_wcet(0.9999));
-            return rwcet; 
-        }
+            rdist = std::make_shared<ResponseEVTDistribution>(libta::distribution_type_t::EVT_GPD_3PARAM);
+            rwcet->set_wcet_value(solver.get_pwcet_wcet(0.9999));   
 
+            auto it = std::dynamic_pointer_cast<const chronovise::GPD_Distribution> (*solver.get_estimated_distributions().cbegin());                        
+            rdist->set_parameters(it->get_location(),it->get_scale(),it->get_shape());
+            return rwcet;
+        } 
+
+        std::shared_ptr<Response> get_ResponseEVTDistribution()
+        {
+            return rdist;
+        }
     };
 
 };    // libta,
@@ -47,13 +58,15 @@ int main() {
 
     static std::random_device random_dev;
     static std::mt19937 mt(random_dev());
-    static std::normal_distribution<double> distribution(8.0,1.0);
+    static std::normal_distribution<double> distribution(84.0,3.2);
     for(int i = 0; i < 20000; i++)
         req->add_value(distribution(mt));
 
     std::shared_ptr<ResponseWCET<unsigned long>> rwcet = std::dynamic_pointer_cast<ResponseWCET<unsigned long>>(cta.perform_analysis(req));
-
+    std::shared_ptr<ResponseEVTDistribution> rdist = std::dynamic_pointer_cast<ResponseEVTDistribution>(cta.get_ResponseEVTDistribution());
+      
     std::cout << "WCET Value: " << rwcet->get_wcet_value() << std::endl;
+    std::cout << "mu: " << rdist->get_mu() << " sigma: " << rdist->get_sigma() << " xi: " << rdist->get_xi() << std::endl;
 
     return 0;
 }
