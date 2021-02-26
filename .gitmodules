@@ -1,3 +1,6 @@
 [submodule "chronovise/chronovise"]
 	path = chronovise/chronovise
 	url = https://github.com/federeghe/chronovise.git
+[submodule "chronovise/libchronovise"]
+	path = chronovise/libchronovise
+	url = https://github.com/federeghe/chronovise.git
