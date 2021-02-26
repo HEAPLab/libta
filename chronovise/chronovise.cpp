@@ -1,11 +1,8 @@
 #include "SimpleChronovise.hpp"
 #include "chronovise.hpp"
 
-#include <iostream>
 #include <memory>
 
-#include <iostream>
-#include <iomanip>
 #include "evt/evtapproach_bm.hpp"
 #include "statistical/estimator_mle.hpp"
 #include "statistical/test_ks.hpp"
@@ -39,26 +36,5 @@ namespace libta {
     {
         return rdist;
     }
-};    // libta,
+}    // libta
 
-// int main() {
-//     using namespace libta;
-
-//     ChronoviseTimingAnalyzer cta;
-
-//     std::shared_ptr<Request<unsigned long>> req = std::make_shared<Request<unsigned long>>();
-
-//     static std::random_device random_dev;
-//     static std::mt19937 mt(random_dev());
-//     static std::normal_distribution<double> distribution(84.0,3.2);
-//     for(int i = 0; i < 20000; i++)
-//         req->add_value(distribution(mt));
-
-//     std::shared_ptr<ResponseWCET<unsigned long>> rwcet = std::dynamic_pointer_cast<ResponseWCET<unsigned long>>(cta.perform_analysis(req));
-//     std::shared_ptr<ResponseEVTDistribution> rdist = std::dynamic_pointer_cast<ResponseEVTDistribution>(cta.get_ResponseEVTDistribution());
-      
-//     std::cout << "WCET Value: " << rwcet->get_wcet_value() << std::endl;
-//     std::cout << "mu: " << rdist->get_mu() << " sigma: " << rdist->get_sigma() << " xi: " << rdist->get_xi() << std::endl;
-
-//     return 0;
-// }

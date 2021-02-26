@@ -6,9 +6,6 @@
 #include "statistical/test_ljung_box.hpp"
 #include "input/generator_null.hpp"
 
-#include <iostream>
-#include <iomanip>
-
 using namespace chronovise;
 
 using exit_code_t = AbstractExecutionContext<unsigned int, double>::exit_code_t;
@@ -69,21 +66,12 @@ exit_code_t SimpleChronovise::onConfigure() noexcept
 }
 
 exit_code_t SimpleChronovise::onRun() noexcept {
-
-    // // Some C++11 stuffs to initialize the random normal distribution
-    // static std::random_device random_dev;
-    // static std::mt19937 mt(random_dev());
-    // static std::normal_distribution<double> distribution(12.0,1.0);
-
-    // // // Add a new sample as a "time measure" drawned by an i.i.d. normal distribution.
-    // auto new_sample = distribution(mt);
     
     if(it != data.end()){
         this->add_sample(*it);
         it++;
     }
 
-    //this->add_sample(new_sample);
     
     return AEC_OK;
 }
@@ -97,18 +85,6 @@ exit_code_t SimpleChronovise::onMonitor() noexcept {
 }
 
 exit_code_t SimpleChronovise::onRelease() noexcept {
-
-    // this->print_evt_info();
-
-    // // Print of the results, etc.
-    // this->print_distributions_summary();
-
-    // this->print_wcots();
-
-    // std::cout << "pWCET(p=0.999999) is: " << this->get_pwcet_wcet(0.999999) << std::endl;
-    // std::cout << "pWCET(p=1-10^(-9)) is: " << this->get_pwcet_wcet(1 - std::pow(10., -9.)) << std::endl;
-    // double prob= this->get_pwcet_probability(16.8);
-    // std::cout << "pWCET(WCET=16.8) is: " << std::setprecision(16) << prob << std::endl;
 
     return AEC_OK;
 }

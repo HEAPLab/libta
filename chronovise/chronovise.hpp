@@ -1,5 +1,5 @@
-#ifndef CHROTIM_H_
-#define CHROTIM_H_
+#ifndef LIBTA_CHRONOVISE_H_
+#define LIBTA_CHRONOVISE_H_
 
 #include "libta.h"
 
