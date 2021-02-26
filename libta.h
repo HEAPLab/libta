@@ -312,6 +312,6 @@ public:
 
 };
 
-};    // libta
+}    // libta
 
 #endif // LIBTA_H_
