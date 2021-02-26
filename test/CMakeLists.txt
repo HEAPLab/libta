@@ -19,7 +19,7 @@ if((DEFINED GTEST_LIBRARY) OR (DEFINED GTEST_MAIN_LIBRARY))
 	target_link_libraries(libta-testing ta)
 
 	add_test(NAME libta-testing COMMAND libta-testing)
-	add_custom_target(check COMMAND libta-testing)
+	add_custom_target(check_ta COMMAND libta-testing)
 else()
 
 	message(WARNING "Google Test framework NOT FOUND - Testing not available.")

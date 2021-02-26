@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 project(libta)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 set(CMAKE_CXX_STANDARD 14)
 
 
@@ -20,5 +22,5 @@ endif()
 
 # Include that for the building
 add_subdirectory(${IMP_L})
-add_subdirectory(test)
-add_subdirectory(chronovise/chronovise)
+#add_subdirectory(test)
+add_subdirectory(chronovise/libchronovise)

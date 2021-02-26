@@ -9,5 +9,3 @@ set_target_properties(taStatic PROPERTIES OUTPUT_NAME ta)
 target_link_libraries(ta PUBLIC chronovise)
 target_link_libraries(taStatic PUBLIC chronovise)
 
-#add_executable(chrono ${SOURCES})
-#target_link_libraries(chrono PUBLIC chronovise)
