@@ -1,7 +1,7 @@
 #ifndef SIMPLE_CHRONOVISE_HPP_
 #define SIMPLE_CHRONOVISE_HPP_
 
-#include "sec.hpp"
+#include "chronovise/sec.hpp"
 
 
 class SimpleChronovise : public chronovise::SimpleExecutionContext<unsigned int, double> {

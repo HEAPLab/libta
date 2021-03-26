@@ -1,0 +1,24 @@
+
+menu "Timing Analysis Library (libta)"
+
+config EXTERNAL_LIBTA
+  bool "Enable libta"
+  default n
+  ---help---
+  Build the libta library for the Timing Analysis.
+
+
+choice
+prompt "LIBTA Implementation"
+depends on EXTERNAL_LIBTA
+
+config EXTERNAL_LIBTA_IMPL_CHRONOVISE
+  bool "Chronovise"
+
+config EXTERNAL_LIBTA_IMPL_BSCTA
+  bool "BSC TA"
+
+
+endchoice
+
+endmenu

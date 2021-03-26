@@ -1,10 +1,10 @@
 #include "SimpleChronovise.hpp"
 
-#include "evt/evtapproach_bm.hpp"
-#include "statistical/estimator_mle.hpp"
-#include "statistical/test_ks.hpp"
-#include "statistical/test_ljung_box.hpp"
-#include "input/generator_null.hpp"
+#include "chronovise/evt/evtapproach_bm.hpp"
+#include "chronovise/statistical/estimator_mle.hpp"
+#include "chronovise/statistical/test_ks.hpp"
+#include "chronovise/statistical/test_ljung_box.hpp"
+#include "chronovise/input/generator_null.hpp"
 
 using namespace chronovise;
 
