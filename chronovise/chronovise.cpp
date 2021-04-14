@@ -1,5 +1,5 @@
 #include "SimpleChronovise.hpp"
-#include "chronovise.hpp"
+#include "chronovise.h"
 
 #include <memory>
 
