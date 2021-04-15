@@ -22,19 +22,21 @@ namespace libta {
         SimpleChronovise solver(times);
         solver.run();
         
-        (void)exec_times;
         std::shared_ptr<ResponseWCET<unsigned long>> rwcet = std::make_shared<ResponseWCET<unsigned long>>();
-        rdist = std::make_shared<ResponseEVTDistribution>(libta::distribution_type_t::EVT_GPD_3PARAM);
+        auto rdist = std::make_shared<ResponseEVTDistribution>(libta::distribution_type_t::EVT_GPD_3PARAM);
         rwcet->set_wcet_value(solver.get_pwcet_wcet(0.9999));   
 
         auto it = std::dynamic_pointer_cast<const chronovise::GPD_Distribution> (*solver.get_estimated_distributions().cbegin());                        
         rdist->set_parameters(it->get_location(),it->get_scale(),it->get_shape());
-        return rwcet;
+        
+        this->rwcet = rwcet;
+        
+        return rdist;
     } 
 
-    std::shared_ptr<Response> ChronoviseTimingAnalyzer::get_ResponseEVTDistribution()
+    std::shared_ptr<ResponseWCET<unsigned long>> ChronoviseTimingAnalyzer::get_WCET()
     {
-        return rdist;
+        return rwcet;
     }
 }    // libta
 
