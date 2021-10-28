@@ -18,7 +18,6 @@ config EXTERNAL_LIBTA_IMPL_CHRONOVISE
 config EXTERNAL_LIBTA_IMPL_BSCTA
   bool "BSC TA"
 
-
 endchoice
 
 endmenu
