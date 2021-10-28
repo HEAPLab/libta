@@ -24,6 +24,7 @@
 #define LIBTA_H_
 
 #include <cassert>
+#include <cmath>
 #include <memory>
 #include <vector>
 #include <tuple>
@@ -179,9 +180,59 @@ public:
         return this->dist_type;
     }
 
+	double get_quantile(double p) const {
+		switch(this->dist_type) {
+			case distribution_type_t::EVT_GEV:
+				return get_gev_quantile(p);
+			case distribution_type_t::EVT_GPD_2PARAM:
+			case distribution_type_t::EVT_GPD_3PARAM:
+				return get_gpd_quantile(p);
+			default:
+				assert(false);
+		}
+
+	}
+
+
 private:
     const distribution_type_t dist_type;
     parameters_t params;
+
+	double get_gev_quantile(double p) const {
+		if (p <= 0. || p >= 1.) {
+		    throw std::invalid_argument("The probability value is not valid.");
+		}
+
+		auto mu = std::get<P_MU>(params);
+		auto sg = std::get<P_SIGMA>(params);
+		auto xi = std::get<P_XI>(params);
+
+		if (xi == 0.) {
+		    return mu - sg * std::log(-std::log(p));
+		} else {
+		    return mu + sg * (1.-std::pow((-std::log(p)),(-xi)))/(-xi);
+		}
+	}
+
+	double get_gpd_quantile(double p) const {
+		auto mu = std::get<P_MU>(params);
+		auto sg = std::get<P_SIGMA>(params);
+		auto xi = std::get<P_XI>(params);
+		
+		if (p <= 0. || p >= 1.) {
+		    throw std::invalid_argument("The probability value is not valid.");
+		}
+
+		double quantile;
+
+		if (xi != 0.) {
+		    quantile = mu + sg  * (1. - std::pow(1. - p, -xi)) / (-xi);
+		} else {
+		    quantile = mu - sg * std::log(1. - p);
+		}
+
+		return quantile;
+	}
 
 };
 

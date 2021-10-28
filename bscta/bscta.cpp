@@ -111,7 +111,7 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 }
 
 template <typename T>
-T BSCTimingAnalyzer<T>::get_wcet_at_p(double x, double mu, double sg, double xi) const {
+T BSCTimingAnalyzer<T>::get_wcet_at_p(double p, double mu, double sg, double xi) const {
     if (p <= 0. || p >= 1.) {
         throw std::invalid_argument("The probability value is not valid.");
     }

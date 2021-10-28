@@ -41,7 +41,7 @@ private:
  	std::shared_ptr<ResponseEVTDistribution> high_gpd;
 	std::shared_ptr<ResponseEVTDistribution> low_gpd;
 
-	T get_wcet_at_p(double x, double mu, double sigma, double xi) const;
+	T get_wcet_at_p(double p, double mu, double sigma, double xi) const;
 
 };
 
