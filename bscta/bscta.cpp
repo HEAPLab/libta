@@ -111,39 +111,29 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 }
 
 template <typename T>
-T BSCTimingAnalyzer<T>::get_wcet_at_p(double x, double mu, double sg, double xi) const noexcept {
-	x = 1 - x;
-	assert(x >= 0 && x <= 1);
-
-    // Check the support limits
-    if (xi >= 0. && x < mu)
-        return 0.;
-    if (xi < 0.  && (x < mu || x > mu - sg / xi))
-        return 0.;
-
-    const double norm_x = (x-mu)/sg;
-    double cond_value = 1. + xi * norm_x;
-
-    double cdf = 0.;
-
-    if (cond_value >= 0. && xi != 0.) {
-        cdf = 1. - std::pow(cond_value, - 1. / xi);
+T BSCTimingAnalyzer<T>::get_wcet_at_p(double x, double mu, double sg, double xi) const {
+    if (p <= 0. || p >= 1.) {
+        throw std::invalid_argument("The probability value is not valid.");
     }
-    else if (x >= 0. && xi == 0.) {
-        cdf = 1. - std::exp(-norm_x);
+
+    double quantile;
+
+    if (xi != 0.) {
+        quantile = mu + sg  * (1. - std::pow(1. - p, -xi)) / (-xi);
+    } else {
+        quantile = mu - sg * std::log(1. - p);
     }
-    
-    assert(cdf >= 0. && cdf <= 1. && "Something bad happened in calculation.");
-    return cdf;
+
+    return quantile;
 }
 
 template <typename T>
-T BSCTimingAnalyzer<T>::get_high_wcet_at_p(double x) const noexcept {
+T BSCTimingAnalyzer<T>::get_high_wcet_at_p(double x) const {
 	return BSCTimingAnalyzer<T>::get_wcet_at_p(x, this->high_gpd->get_mu(), this->high_gpd->get_sigma(), this->high_gpd->get_xi()); 
 }
 
 template <typename T>
-T BSCTimingAnalyzer<T>::get_low_wcet_at_p(double x) const noexcept {
+T BSCTimingAnalyzer<T>::get_low_wcet_at_p(double x) const {
 	return BSCTimingAnalyzer<T>::get_wcet_at_p(x, this->low_gpd->get_mu(), this->low_gpd->get_sigma(), this->low_gpd->get_xi()); 
 }
 

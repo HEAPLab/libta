@@ -32,8 +32,8 @@ public:
 		return this->low_gpd;
 	}
 
-	virtual T get_high_wcet_at_p(double x) const noexcept;
-	virtual T get_low_wcet_at_p(double x) const noexcept;
+	virtual T get_high_wcet_at_p(double x) const;
+	virtual T get_low_wcet_at_p(double x) const;
 	
 private:
 	const int rank_length;
@@ -41,7 +41,7 @@ private:
  	std::shared_ptr<ResponseEVTDistribution> high_gpd;
 	std::shared_ptr<ResponseEVTDistribution> low_gpd;
 
-	T get_wcet_at_p(double x, double mu, double sigma, double xi) const noexcept;
+	T get_wcet_at_p(double x, double mu, double sigma, double xi) const;
 
 };
 
