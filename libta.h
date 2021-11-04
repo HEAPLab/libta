@@ -190,7 +190,7 @@ public:
 			default:
 				assert(false);
 		}
-
+		return 0;	// Cannot be reached
 	}
 
 
