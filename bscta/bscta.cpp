@@ -66,6 +66,9 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 	}
 
     T excessesMean = getUnbiasedMean(trace_sorted,0,nelems);
+	if(excessesMean == T(0)) {
+		throw TimingAnalyzerError("No sufficient variability in the samples.", error_t::INVALID_DATA);
+	}
     std::vector<T> tailValues(trace_sorted.begin(), trace_sorted.begin()+nelems);
     const T rate = 1/excessesMean;
     //Impose the template enforce the type casting of the input
