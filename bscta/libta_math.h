@@ -51,9 +51,17 @@ namespace libta {
         for(size_t i=start; i<start+size; i++) {
             const T delta=v[i] - v[start+size-1];
             sumOfValues+= delta;
-            sumOfSquares+=(delta*delta);
+            //sumOfSquares+=(delta*delta);
         }
-        return internalSqrt<T>( sumOfSquares/(size-1)-internalPow<T>(sumOfValues,2)/((size-1)*size) );
+        T mean=sumOfValues/size;
+        
+        for(size_t i=start; i<start+size; i++) {
+            const T delta=v[i] - v[start+size-1];
+            sumOfSquares+= internalPow<T>(delta-mean,2);
+        }
+        //return internalSqrt<T>( sumOfSquares/(size-1)-internalPow<T>(sumOfValues,2)/((size-1)*size) );
+        return internalSqrt<T>( sumOfSquares/(size-1));
+    
     }
     
 

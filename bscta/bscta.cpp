@@ -50,19 +50,22 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 	assert(limitabove.size() == cv.size());
 
 	int nelems =  0;
+	
 	//Find the values below the limitabove starting from the end
-	for(size_t i=cv.size()-1; i>=0; i--) {
+	for(int i=cv.size()-1; i>=0; i--) {
 		        //Impose the template enforce the type casting of the input
-		T upperLimit = 1 + (1.96/internalSqrt<T>(half_size-i));
+		T upperLimit = 1 + (1.96/internalSqrt<T>(half_size-i-2));
 		if(cv[i]>=upperLimit)
-		    break;
+			break;
 		nelems++;
 	}
-
+	T threshold=trace_sorted[nelems];
     //We need at least minvalues samples to estimate the tail.
     //If this property is not satisfied, we're force to fail.
     if(nelems < minvalues) {
-		throw TimingAnalyzerError("Minvalues samples are not satisfied.\nYou need to get more samples.", error_t::INVALID_DATA);
+		throw TimingAnalyzerError(std::string("Minvalues samples are not satisfied nelems: ")+std::to_string(nelems)+
+								 std::string(" minvalues: ")+std::to_string(minvalues)+
+								 std::string(" samples: ")+std::to_string(trace_sorted.size()), error_t::INVALID_DATA);
 	}
 
     T excessesMean = getUnbiasedMean(trace_sorted,0,nelems);
@@ -70,6 +73,7 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 		throw TimingAnalyzerError("No sufficient variability in the samples.", error_t::INVALID_DATA);
 	}
     std::vector<T> tailValues(trace_sorted.begin(), trace_sorted.begin()+nelems);
+	//const T tailValuesMean= std::accumulate(tailValues.begin(),tailValues.end(),T(0))/tailValues.size();
     const T rate = 1/excessesMean;
     //Impose the template enforce the type casting of the input
     const T ratelow = rate * (1 + (1.96/internalSqrt<T>(nelems)));
@@ -103,12 +107,13 @@ std::shared_ptr<Response> BSCTimingAnalyzer<T>::perform_analysis(std::shared_ptr
 	// TODO add mean value
 
 	this->low_gpd = std::make_shared <ResponseEVTDistribution> (distribution_type_e::EVT_GPD_2PARAM);
-	this->low_gpd->set_parameters(0, ratelow, 0);
+	this->low_gpd->set_parameters(threshold, 1/ratelow, 0,threshold);
 	this->high_gpd = std::make_shared <ResponseEVTDistribution> (distribution_type_e::EVT_GPD_2PARAM);
-	this->high_gpd->set_parameters(0, ratehigh, 0);
+	this->high_gpd->set_parameters(threshold, 1/ratehigh, 0,threshold);
 
 	auto gpd = std::make_shared <ResponseEVTDistribution> (distribution_type_e::EVT_GPD_2PARAM);
-	gpd->set_parameters(0, rate, 0);
+	gpd->set_parameters(threshold, 1/rate, 0, threshold);
+
     return gpd;
 
 }

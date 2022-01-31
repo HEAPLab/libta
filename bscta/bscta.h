@@ -34,7 +34,6 @@ public:
 
 	virtual T get_high_wcet_at_p(double x) const;
 	virtual T get_low_wcet_at_p(double x) const;
-	
 private:
 	const int rank_length;
 

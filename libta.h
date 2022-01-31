@@ -121,11 +121,12 @@ public:
      * version of GPD. In case of 2-parameters version GPD the first value (\mu) is not present and
      * ignored. 
      */
-    typedef std::tuple<double, double, double> parameters_t;
+    typedef std::tuple<double, double, double, double> parameters_t;
 
     static constexpr int P_MU    = 0;    /**<  */
     static constexpr int P_SIGMA = 1;    /**<  */
     static constexpr int P_XI    = 2;    /**<  */
+    static constexpr int P_THRSH = 3;
 
     /**
      * @brief The ResponseEVTDistribution class constructor
@@ -142,9 +143,13 @@ public:
       */
     virtual ~ResponseEVTDistribution() = default;
 
-    /** @brief Setter for distribution parameters */
+    /*/** @brief Setter for distribution parameters */
     void set_parameters(double mu, double sigma, double xi) noexcept {
-        set_parameters(std::make_tuple(mu, sigma, xi));
+        set_parameters(std::make_tuple(mu, sigma, xi,0));
+    }
+        /** @brief Setter for distribution parameters */
+    void set_parameters(double mu, double sigma, double xi,double threshold ) noexcept {
+        set_parameters(std::make_tuple(mu, sigma, xi, threshold));
     }
 
     /** @brief Setter for distribution parameters */
@@ -168,6 +173,10 @@ public:
     /** @brief Getter for \xi parameter */
     inline double get_xi()    const noexcept {
         return std::get<P_XI>(params);
+    }
+    /** @brief Getter for \xi parameter */
+    inline double get_threshold()    const noexcept {
+        return std::get<P_THRSH>(params);
     }
 
     /** @brief Getter for the paramters tuple */
